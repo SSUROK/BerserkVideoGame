@@ -8,26 +8,20 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.screen.FirstScreen;
 import com.mygdx.game.screen.MainMenu;
 
+/**
+ * BerserkVideoGame - главный класс игры, управляющий ее жизненным циклом и состояниями.
+ */
+
 public class BerserkVideoGame extends Game {
 	SpriteBatch batch;
 	Texture img;
-	
+
+	/**
+	 * Вызывается при создании приложения. В этом методе инициализируются ресурсы
+	 * и устанавливается первый экран игры.
+	 */
 	@Override
 	public void create () {
 		setScreen(new MainMenu(this));
 	}
-
-//	@Override
-//	public void render () {
-//		ScreenUtils.clear(1, 0, 0, 1);
-//		batch.begin();
-//		batch.draw(img, 0, 0);
-//		batch.end();
-//	}
-//
-//	@Override
-//	public void dispose () {
-//		batch.dispose();
-//		img.dispose();
-//	}
 }

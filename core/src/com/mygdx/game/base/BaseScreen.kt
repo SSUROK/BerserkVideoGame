@@ -17,31 +17,42 @@ import com.badlogic.gdx.utils.Pool
 import com.badlogic.gdx.utils.ScreenUtils
 import com.mygdx.game.entities.Player
 
-
+/**
+ * BaseScreen - базовый класс для всех экранов игры.
+ * Он реализует базовую логику отображения и управления экранами.
+ * Наследуется от класса InputAdapter и реализует интерфейс Screen.
+ * @param game - класс игры.
+ */
 abstract class BaseScreen (
     val game: Game
 ): Screen, InputAdapter() {
+    /** текущая карта уровня, устройство отрисовки карты, камера игры*/
     var map: TiledMap? = null
     var renderer: OrthogonalTiledMapRenderer? = null
     var camera: OrthographicCamera? = null
+    /** объект игрока*/
     var player: Player? = null
 
+    /** Размеры экрана*/
     val SCREEN_WIDTH = Gdx.graphics.width.toFloat()
     val SCREEN_HEIGHT = Gdx.graphics.height.toFloat()
 
-    var title: TextureRegion? = null
     var batch: SpriteBatch? = null
     var time = 0f
 
 
     private var touch: Vector2? = null
 
+    /**
+     * Вызывается при создании экрана. Устанавливает этот экран как процессор ввода.
+     */
     override fun show() {
         Gdx.input.inputProcessor = this
     }
 
     override fun resume() {}
 
+    /** Метод отрисовки экрана, вызывается 60 раз в секунду.*/
     override fun render(delta: Float) {
         // clear the screen
         ScreenUtils.clear(0.7f, 0.7f, 1.0f, 1f)
@@ -76,32 +87,21 @@ abstract class BaseScreen (
     override fun hide() {
         Gdx.app.debug("Berserk", "dispose ${this.javaClass.name}");
         batch?.dispose();
-        title?.texture?.dispose();
     }
-
-    //    override fun resize(width: Int, height: Int) {
-//        screenBounds!!.setSize(width.toFloat(), height.toFloat())
-//        screenBounds!!.setLeft(0f)
-//        screenBounds!!.setBottom(0f)
-//
-//        val aspect = width / height.toFloat()
-//        worldBounds!!.setHeight(1f)
-//        worldBounds!!.setWidth(1f * aspect)
-//        MatrixUtils.calcTransitionMatrix(worldToGl!!, worldBounds!!, glBounds!!)
-//        batch!!.setProjectionMatrix(worldToGl)
-//        MatrixUtils.calcTransitionMatrix(screenToWorld!!, screenBounds!!, worldBounds!!)
-//        resize(worldBounds!!)
-//    }
-
-//    open fun resize(worldBounds: Rect) {
-//        println(("resize width = " + worldBounds.getWidth()).toString() + " height = " + worldBounds.getHeight())
-//    }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
 //        player?.attack(screenX, screenY, pointer)
         return super.touchDragged(screenX, screenY, pointer)
     }
 
+    /**
+     * Проверяет, нажал ли пользователь в данную часть экрана.
+     *
+     * @param startX начальная координата X.
+     * @param endX конечная координата X.
+     * @param startY начальная координата Y.
+     * @param endY конечная координата Y.
+     */
     fun isTouched(startX: Float, endX: Float, startY: Float = 0f, endY: Float = 1f): Boolean {
         for (i in 0..1) {
             val y = Gdx.input.getY(i) / Gdx.graphics.height.toFloat()

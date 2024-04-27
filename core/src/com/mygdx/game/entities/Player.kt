@@ -21,6 +21,14 @@ import com.mygdx.game.base.Entity
 import kotlin.math.abs
 
 
+/**
+ * Player - класс, представляющий игрока.
+ * Этот класс расширяет базовый класс Entity и предоставляет функциональность для управления игровым персонажем.
+ *
+ * @param map карта, на которой размещен игрок.
+ * @param x координата X игрока на карте.
+ * @param y координата Y игрока на карте.
+ */
 class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
     public var weaponEquipped = false
@@ -31,6 +39,9 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         }
     }
     private val tiles: Array<Rectangle> = Array<Rectangle>()
+
+    /** Инициализация игрового персонажа. Устанавливается атлас текстур, затем создаются основные
+     * анимации персонажа. */
     init{
         // load the koala frames, split them, and assign them to Animations
         texture = Texture("data/textures/character.png")
@@ -55,6 +66,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         HEIGHT = 1 / 16f * s[0][0].regionHeight.toFloat()
     }
 
+    /** метод отрисовки игрового персонажа на экране. должен вызываться из метода отрисовки экрана */
     override fun render(deltaTime: Float, renderer: OrthogonalTiledMapRenderer) {
         // based on the koala state, get the animation frame
         var frame: TextureRegion? = null
@@ -77,6 +89,8 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         batch.end()
     }
 
+    /** метод обновления состояния игрового персонажа со временем. реализует управление персонажем.
+     *  должен вызываться из метода обновления экрана */
     override fun update(delta: Float) {
         super.update(delta)
         if (delta == 0f) return
@@ -203,6 +217,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         this.velocity.x *= this.DAMPING
     }
 
+    /** получает от карты все тайлы вокруг игрока для обработки коллизий, нахождения триггеров */
     private fun getTiles(startX: Int, startY: Int, endX: Int, endY: Int, tiles: Array<Rectangle>) {
         val layer = map.layers?.get("Ground") as TiledMapTileLayer
         rectPool.freeAll(tiles)
@@ -235,24 +250,27 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         }
     }
 
+    /** метод для прыжеов персонажа */
     fun jump(){
         this.velocity.y += this.JUMP_VELOCITY
         this.state = State.Jumping
         this.grounded = false
     }
 
+    /** метод движения налево */
     fun moveLeft(){
         this.velocity.x = -this.MAX_VELOCITY
         if (this.grounded) this.state = State.Walking
         this.facesRight = false
     }
-
+    /** метод движения направо */
     fun moveRight(){
         this.velocity.x = this.MAX_VELOCITY
         if (this.grounded) this.state = State.Walking
         this.facesRight = true
     }
 
+    /** метод атаки персонажа */
     fun attack(){
         if (this.weaponEquipped) {
             this.velocity.x = 0f
@@ -261,6 +279,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         }
     }
 
+    /** метод создания коллизии персонажа */
     fun createCollisionRect(): Rectangle {
         val playerRect: Rectangle = rectPool.obtain()
         playerRect.set(this.position.x, this.position.y, this.WIDTH, this.HEIGHT)

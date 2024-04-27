@@ -17,12 +17,22 @@ import com.mygdx.game.base.BaseScreen
 import com.mygdx.game.entities.Player
 
 
+/**
+ * FirstScreen - экран начала игры.
+ * Отображает начало игры, загружает карту и управляет игровым процессом.
+ * Наследуется от класса BaseScreen.
+ */
 class FirstScreen(game: Game) : BaseScreen(game) {
 
     private var textTriggers : MapObjects? = null
     private var chestTriggers : MapObjects? = null
     private var activeChest : RectangleMapObject? = null
     val font = BitmapFont()
+
+    /**
+     * Вызывается при создании экрана. Здесь происходит инициализация всех необходимых
+     * элементов, таких как камера, игрок, фон и т.д.
+     */
     override fun show() {
         super.show()
         map = TmxMapLoader().load("data/maps/map1/act0.tmx")
@@ -43,6 +53,10 @@ class FirstScreen(game: Game) : BaseScreen(game) {
         font.color = Color.BLACK
     }
 
+    /**
+     * Вызывается при отрисовке экрана. Здесь происходит отрисовка всех элементов
+     * и обработка логики взаимодействия с игровыми объектами.
+     */
     override fun render(delta: Float) {
         super.render(delta)
         val playerRect = player?.createCollisionRect()
@@ -73,6 +87,15 @@ class FirstScreen(game: Game) : BaseScreen(game) {
         }
     }
 
+    /**
+     * Обрабатывает событие нажатия на экране.
+     * Здесь обрабатывается открытие сундука и активация текстового сообщения о нападении.
+     *
+     * @param screenX x-координата нажатия на экране.
+     * @param screenY y-координата нажатия на экране.
+     * @param pointer указатель события.
+     * @param button кнопка, которая была нажата (левая, правая и т.д.).
+     */
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if(activeChest!= null){
             val or = activeChest!!.rectangle

@@ -12,12 +12,23 @@ import com.mygdx.game.math.Rect
 import com.mygdx.game.sprite.Background
 
 
+/**
+ * MainMenu - экран главного меню игры.
+ * Отображает главное меню, содержащее фон и кнопку для начала игры.
+ * Наследуется от класса BaseScreen.
+ *
+ */
 class MainMenu(game:Game) : BaseScreen(game) {
 
     private var background: Background? = null
 
     private var bg: Texture? = null
+    private var title: TextureRegion? = null
 
+    /**
+     * Вызывается при показе экрана. Здесь происходит инициализация всех необходимых
+     * элементов, таких как фон и кнопки.
+     */
     override fun show() {
         title = TextureRegion(Texture(Gdx.files.internal("data/badlogic.jpg")),
             0, 0,  256, 256)
@@ -29,6 +40,10 @@ class MainMenu(game:Game) : BaseScreen(game) {
 //        music.setLooping(true)
     }
 
+    /**
+     * Вызывается при отрисовке экрана. Здесь происходит отрисовка всех элементов,
+     * а также обработка пользовательского ввода для перехода на следующий экран.
+     */
     override fun render(delta: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch?.begin();
@@ -45,17 +60,9 @@ class MainMenu(game:Game) : BaseScreen(game) {
         }
     }
 
-//    override fun resize(worldBounds: Rect) {
-//        background!!.resize(worldBounds)
-//    }
-
-//    private fun update(delta: Float) {
-//
-//    }
-
-//    private fun draw() {
-//        batch!!.begin()
-//        background!!.draw(batch!!)
-//        batch!!.end()
-//    }
+    /** Убирает объекты экрана */
+    override fun hide() {
+        super.hide()
+        title?.texture?.dispose();
+    }
 }

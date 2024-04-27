@@ -3,6 +3,8 @@ package com.mygdx.game.math
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 
+
+/** базовый класс для любого объекта на экране. Устаревшая реализация, к удалению в следующей версии. */
 open class Rect(
     protected var halfWidth : Float = 0f,
     protected var halfHeight : Float = 0f,

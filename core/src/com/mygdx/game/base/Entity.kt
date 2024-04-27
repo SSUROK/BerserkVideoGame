@@ -14,6 +14,14 @@ import com.badlogic.gdx.math.Vector2
 import kotlin.math.abs
 
 
+/**
+ * Entity - базовый класс для игровых сущностей.
+ * Он предоставляет основные методы и свойства, общие для всех сущностей.
+ *
+ * @param map карта, на которой размещена сущность.
+ * @param x координата X сущности на карте.
+ * @param y координата Y сущности на карте.
+ */
 open abstract class Entity(
     val map: TiledMap,
     x: Float,
@@ -43,6 +51,9 @@ open abstract class Entity(
     var jump: Animation<TextureRegion>? = null
     var attack: Animation<TextureRegion>? = null
 
+    /**
+     * Перечисление состояний сущности.
+     */
     enum class State {
         Standing,
         Walking,
@@ -54,17 +65,29 @@ open abstract class Entity(
         position.set(x, y)
     }
 
+    /**
+     * Обновляет состояние сущности.
+     *
+     * @param delta время в секундах, прошедшее с последнего обновления.
+     */
     override fun update(delta: Float) {
 
     }
 
+    /**
+     * Отрисовывает сущность.
+     *
+     * @param deltaTime время в секундах, прошедшее с последнего вызова render.
+     * @param renderer рендерер карты.
+     */
     open fun render(deltaTime: Float, renderer: OrthogonalTiledMapRenderer){
     }
 
-
+    /**
+     * Уничтожает сущность.
+     */
     override fun destroy() {
         super.destroy()
-//        boom()
     }
 
 //    fun damage(damage: Int) {
@@ -75,32 +98,5 @@ open abstract class Entity(
 //            hp = 0
 //            destroy()
 //        }
-//    }
-
-    companion object{
-
-    }
-
-//    fun getDamage(): Int {
-//        return damage
-//    }
-
-//    fun getHp(): Int {
-//        return hp
-//    }
-//
-//    fun getV(): Vector2 {
-//        return v
-//    }
-
-//    private fun shoot() {
-//        val bullet: Bullet = bulletPool.obtain()
-//        bullet.set(this, bulletRegion, bulletPos, bulletV, worldBounds, damage, bulletHeight)
-//        bulletSound.play()
-//    }
-
-//    private fun boom() {
-//        val explosion: Explosion = explosionPool.obtain()
-//        explosion.set(getHeight(), pos)
 //    }
 }

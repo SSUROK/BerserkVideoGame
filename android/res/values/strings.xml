@@ -2,5 +2,9 @@
 <resources>
 
     <string name="app_name">Berserk Video Game Java</string>
+    <string name="walk_msg">Для передвижения нажимай на стороны экрана и поцентру сверху для прыжка</string>
+    <string name="sword_msg">Ты нашел меч, нажми на нижнюю часть экрана для атаки</string>
+    <string name="end_msg">А на этом все, до новых встреч</string>
+    <string name="chest_msg">Tap to open</string>
 
 </resources>

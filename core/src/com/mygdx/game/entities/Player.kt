@@ -32,6 +32,8 @@ import kotlin.math.abs
 class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
     public var weaponEquipped = false
+    var goLeft = false
+    var goRight = false
 
     private val rectPool: Pool<Rectangle> = object : Pool<Rectangle>() {
         override fun newObject(): Rectangle {
@@ -64,6 +66,8 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 //         size into world units (1 unit == 16 pixels)
         WIDTH = 1 / 16f * s[0][0].regionWidth.toFloat()
         HEIGHT = 1 / 16f * s[0][0].regionHeight.toFloat()
+        COLLISION_WIDTH = WIDTH * 0.5f
+        COLLISION_HEIGHT = HEIGHT
     }
 
     /** метод отрисовки игрового персонажа на экране. должен вызываться из метода отрисовки экрана */
@@ -101,22 +105,11 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
         this.stateTime += deltaTime
 
-        // check input and apply to velocity & state
-        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || screen!!.isTouched(0.25f, 0.75f, endY=0.5f)) && this.grounded) {
-            jump()
-        }
-
-        if ((Gdx.input.isKeyPressed(Input.Keys.F) || screen!!.isTouched(0.25f, 0.75f, 0.5f))) {
-            attack()
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A) || screen!!.isTouched(
-                0f, 0.25f)) {
+        if (goLeft) {
             moveLeft()
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D) || screen!!.isTouched(
-                0.75f, 1f)) {
+        if (goRight) {
             moveRight()
         }
 
@@ -128,7 +121,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
         // clamp the velocity to the maximum, x-axis only
         this.velocity.x =
-            MathUtils.clamp(this.velocity.x, -this.MAX_VELOCITY, this.MAX_VELOCITY)
+            MathUtils.clamp(this.velocity.x, - this.MAX_VELOCITY, this.MAX_VELOCITY)
 
         if (this.state == State.Attacking && this.stateTime > ATTACK_TIME) {
             this.stateTime = 0f
@@ -155,14 +148,18 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         var endX: Int
         var endY: Int
         if (this.velocity.x > 0) {
-            endX = (this.position.x + this.WIDTH + this.velocity.x).toInt()
-            startX = endX
+            endX = (position.x + velocity.x * COLLISION_WIDTH).toInt()
+            startX = position.x.toInt()
+        } else if (velocity.x < 0) {
+            startX = (position.x + velocity.x * COLLISION_WIDTH).toInt()
+            endX = position.x.toInt()
         } else {
-            endX = (this.position.x + this.velocity.x).toInt()
-            startX = endX
+            startX = position.x.toInt()
+            endX = position.x.toInt()
         }
+        println("%s, %s, %s, %s".format(startX, endX, position.x, velocity.x))
         startY = this.position.y.toInt()
-        endY = (this.position.y - this.HEIGHT).toInt()
+        endY = (this.position.y + this.COLLISION_HEIGHT).toInt()
         getTiles(startX, startY, endX, endY, tiles)
         playerRect.x += this.velocity.x
         for (tile in tiles) {
@@ -176,14 +173,14 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         // if the this is moving upwards, check the tiles to the top of its
         // top bounding box edge, otherwise check the ones to the bottom
         if (this.velocity.y > 0) {
-            endY = (this.position.y + this.HEIGHT + this.velocity.y).toInt()
+            endY = (this.position.y + this.COLLISION_HEIGHT + this.velocity.y).toInt()
             startY = endY
         } else {
             endY = (this.position.y + this.velocity.y).toInt()
             startY = endY
         }
         startX = this.position.x.toInt()
-        endX = (this.position.x + this.WIDTH).toInt()
+        endX = (this.position.x + this.COLLISION_WIDTH).toInt()
         getTiles(startX, startY, endX, endY, tiles)
         playerRect.y += velocity.y
         for (tile in tiles) {
@@ -194,8 +191,8 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
                 if (velocity.y > 0) {
                     position.y = tile.y - HEIGHT
                     // we hit a block jumping upwards, let's destroy it!
-                    val layer = map.layers["walls"] as TiledMapTileLayer
-                    layer.setCell(tile.x.toInt(), tile.y.toInt(), null)
+//                    val layer = map.layers["walls"] as TiledMapTileLayer
+//                    layer.setCell(tile.x.toInt(), tile.y.toInt(), null)
                 } else {
                     position.y = tile.y + tile.height
                     // if we hit the ground, mark us as grounded so we can jump
@@ -234,20 +231,8 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         }
     }
 
-    fun keyDown(keycode: Int){
-        when (keycode) {
-            Input.Keys.A or Input.Keys.LEFT -> {moveLeft()}
-            Input.Keys.D or Input.Keys.RIGHT -> {moveRight()}
-            Input.Keys.SPACE or Input.Keys.UP -> {jump()}
-        }
-    }
-
     fun touchDown(v: Vector2, pointer: Int, button: Int){
-        when (v){
-            Vector2(0f, 0.25f) -> {moveLeft()}
-            Vector2(0.25f, 0.75f) -> {moveRight()}
-            Vector2(0.75f, 1f) -> {jump()}
-        }
+
     }
 
     /** метод для прыжеов персонажа */
@@ -258,13 +243,13 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
     }
 
     /** метод движения налево */
-    fun moveLeft(){
+    private fun moveLeft(){
         this.velocity.x = -this.MAX_VELOCITY
         if (this.grounded) this.state = State.Walking
         this.facesRight = false
     }
     /** метод движения направо */
-    fun moveRight(){
+    private fun moveRight(){
         this.velocity.x = this.MAX_VELOCITY
         if (this.grounded) this.state = State.Walking
         this.facesRight = true
@@ -282,7 +267,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
     /** метод создания коллизии персонажа */
     fun createCollisionRect(): Rectangle {
         val playerRect: Rectangle = rectPool.obtain()
-        playerRect.set(this.position.x, this.position.y, this.WIDTH, this.HEIGHT)
+        playerRect.set(position.x, position.y, COLLISION_WIDTH, COLLISION_HEIGHT)
         return playerRect
     }
 }

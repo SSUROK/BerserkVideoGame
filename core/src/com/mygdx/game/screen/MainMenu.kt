@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.mygdx.game.base.BaseScreen
-import com.mygdx.game.math.Rect
 import com.mygdx.game.sprite.Background
 
 
@@ -30,6 +29,7 @@ class MainMenu(game:Game) : BaseScreen(game) {
      * элементов, таких как фон и кнопки.
      */
     override fun show() {
+        super.show()
         title = TextureRegion(Texture(Gdx.files.internal("data/badlogic.jpg")),
             0, 0,  256, 256)
         batch = SpriteBatch()
@@ -54,7 +54,7 @@ class MainMenu(game:Game) : BaseScreen(game) {
         time += delta;
         if (time > 1) {
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
-                game.setScreen(FirstScreen(game));
+                game.setScreen(GameScreen(game, "data/maps/map1_1.tmx"));
 //                Gdx.app.debug("Berserk", "Go to next screen")
             }
         }

@@ -1,10 +1,10 @@
 package com.mygdx.game.base
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Rectangle
 import com.mygdx.game.math.Rect
-import java.util.Arrays
 
 /**
  * Sprite - базовый класс для спрайтов.
@@ -23,9 +23,7 @@ abstract class Sprite
      var frame: Int = 0,
      var destroyed: Boolean = false): Rect(){
 
-     constructor(region: TextureRegion?):this(regions=arrayOf(region))
-
-    constructor() : this(regions=arrayOf(null))
+    constructor(textureRegion: TextureRegion) : this(regions=arrayOf(null))
 
     /**
      * Устанавливает пропорциональную высоту спрайта.

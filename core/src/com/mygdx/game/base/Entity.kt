@@ -1,6 +1,5 @@
 package com.mygdx.game.base
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
@@ -26,7 +25,7 @@ open abstract class Entity(
     val map: TiledMap,
     x: Float,
     y: Float
-) : Sprite(){
+) : Sprite(TextureRegion()) {
 
     protected var hp = 0
     var velocity = Vector2()
@@ -35,6 +34,8 @@ open abstract class Entity(
     var v0 = Vector2()
     var HEIGHT: Float = 0f
     var WIDTH: Float = 0f
+    var COLLISION_HEIGHT: Float = 0f
+    var COLLISION_WIDTH: Float = 0f
     val DAMPING = 0.87f
     val ATTACK_TIME = 1.65f
     var position = Vector2()

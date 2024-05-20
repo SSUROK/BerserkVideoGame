@@ -3,8 +3,10 @@ package com.mygdx.game.base
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
@@ -23,11 +25,11 @@ import com.mygdx.game.entities.Player
  * Наследуется от класса InputAdapter и реализует интерфейс Screen.
  * @param game - класс игры.
  */
+
 abstract class BaseScreen (
     val game: Game
-): Screen, InputAdapter() {
+): Screen, InputProcessor {
     /** текущая карта уровня, устройство отрисовки карты, камера игры*/
-    var map: TiledMap? = null
     var renderer: OrthogonalTiledMapRenderer? = null
     var camera: OrthographicCamera? = null
     /** объект игрока*/
@@ -40,6 +42,12 @@ abstract class BaseScreen (
     var batch: SpriteBatch? = null
     var time = 0f
 
+    var UI_ELEMENTS: Texture? = null
+    var USE_BUTTON: Texture? = null
+    val maps = mapOf("map1_1" to "data/maps/map1_1.tmx",
+        "map1_2" to "data/maps/map1_2.tmx",
+        "map1_3" to "data/maps/map1_3.tmx")
+
 
     private var touch: Vector2? = null
 
@@ -47,6 +55,7 @@ abstract class BaseScreen (
      * Вызывается при создании экрана. Устанавливает этот экран как процессор ввода.
      */
     override fun show() {
+        USE_BUTTON = Texture("data/textures/move.png")
         Gdx.input.inputProcessor = this
     }
 
@@ -65,6 +74,7 @@ abstract class BaseScreen (
 
         // let the camera follow the koala, x-axis only
         camera?.position?.x = player?.position?.x
+        camera?.position?.y = player?.position?.y?.plus(2f)
         camera?.update()
 
         // set the TiledMapRenderer view based on what the
@@ -91,7 +101,7 @@ abstract class BaseScreen (
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
 //        player?.attack(screenX, screenY, pointer)
-        return super.touchDragged(screenX, screenY, pointer)
+        return false
     }
 
     /**
@@ -110,6 +120,39 @@ abstract class BaseScreen (
                 return true
             }
         }
+        return false
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        println(keycode)
+        return false
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        return false
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        return false
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
+    }
+
+    override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        return false
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         return false
     }
 }

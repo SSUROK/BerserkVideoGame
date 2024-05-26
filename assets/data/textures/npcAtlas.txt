@@ -1,0 +1,166 @@
+npcAtlas.png
+size: 117, 205
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+npc1_map1-1-idle
+  rotate: false
+  xy: 0, 0
+  size: 18, 33
+  orig: 22, 33
+  offset: 2, 0
+  index: 0
+npc1_map1-1-idle
+  rotate: false
+  xy: 18, 0
+  size: 18, 33
+  orig: 22, 33
+  offset: 2, 0
+  index: 1
+npc1_map1-1-idle
+  rotate: false
+  xy: 36, 0
+  size: 18, 33
+  orig: 22, 33
+  offset: 2, 0
+  index: 2
+npc1_map1-1-idle
+  rotate: false
+  xy: 54, 0
+  size: 21, 33
+  orig: 22, 33
+  offset: 1, 0
+  index: 3
+npc1_map1-1-idle
+  rotate: false
+  xy: 75, 0
+  size: 22, 33
+  orig: 22, 33
+  offset: 0, 0
+  index: 4
+npc1_map1-1-idle
+  rotate: false
+  xy: 97, 0
+  size: 20, 33
+  orig: 22, 33
+  offset: 0, 0
+  index: 5
+npc1_map1-1-idle
+  rotate: false
+  xy: 0, 33
+  size: 21, 33
+  orig: 22, 33
+  offset: 0, 0
+  index: 6
+npc1_map1-1-idle
+  rotate: false
+  xy: 21, 33
+  size: 22, 33
+  orig: 22, 33
+  offset: 0, 0
+  index: 7
+npc1_map1-1-idle
+  rotate: false
+  xy: 43, 33
+  size: 21, 33
+  orig: 22, 33
+  offset: 1, 0
+  index: 8
+npc1_map1-1
+  rotate: false
+  xy: 64, 33
+  size: 18, 33
+  orig: 22, 33
+  offset: 2, 0
+  index: -1
+npc1_map1-2-idle
+  rotate: false
+  xy: 82, 33
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: 0
+npc1_map1-2-idle
+  rotate: false
+  xy: 0, 67
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: 1
+npc1_map1-2-idle
+  rotate: false
+  xy: 32, 67
+  size: 33, 34
+  orig: 33, 34
+  offset: 0, 0
+  index: 2
+npc1_map1-2-idle
+  rotate: false
+  xy: 65, 67
+  size: 33, 34
+  orig: 33, 34
+  offset: 0, 0
+  index: 3
+npc1_map1-2-idle
+  rotate: false
+  xy: 0, 101
+  size: 33, 35
+  orig: 33, 35
+  offset: 0, 0
+  index: 4
+npc1_map1-2-idle
+  rotate: false
+  xy: 33, 101
+  size: 33, 35
+  orig: 33, 35
+  offset: 0, 0
+  index: 5
+npc1_map1-2-idle
+  rotate: false
+  xy: 66, 101
+  size: 34, 35
+  orig: 34, 35
+  offset: 0, 0
+  index: 6
+npc1_map1-2-idle
+  rotate: false
+  xy: 0, 136
+  size: 34, 35
+  orig: 34, 35
+  offset: 0, 0
+  index: 7
+npc1_map1-2-idle
+  rotate: false
+  xy: 34, 136
+  size: 33, 35
+  orig: 33, 35
+  offset: 0, 0
+  index: 8
+npc1_map1-2-idle
+  rotate: false
+  xy: 67, 136
+  size: 33, 35
+  orig: 33, 35
+  offset: 0, 0
+  index: 9
+npc1_map1-2-idle
+  rotate: false
+  xy: 0, 171
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: 10
+npc1_map1-2-idle
+  rotate: false
+  xy: 32, 171
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: 11
+npc1_map1-2
+  rotate: false
+  xy: 64, 171
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: -1

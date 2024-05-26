@@ -54,7 +54,7 @@ class MainMenu(game:Game) : BaseScreen(game) {
         time += delta;
         if (time > 1) {
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
-                game.setScreen(GameScreen(game, "data/maps/map1_2.tmx"));
+                game.setScreen(GameScreen(game, "data/maps/map1_1.tmx"));
 //                Gdx.app.debug("Berserk", "Go to next screen")
             }
         }

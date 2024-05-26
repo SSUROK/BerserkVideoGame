@@ -78,10 +78,6 @@ abstract class BaseScreen (
         // camera sees, and render the map
         renderer?.setView(camera)
         renderer?.render()
-
-        // render the koala
-        player?.draw(renderer!!.batch as SpriteBatch)
-
     }
 
     override fun resize(width: Int, height: Int) {}

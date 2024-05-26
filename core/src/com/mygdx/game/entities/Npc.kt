@@ -1,4 +1,4 @@
 package com.mygdx.game.entities
 
-class Npc {
+interface Npc {
 }

@@ -247,7 +247,10 @@
  <objectgroup id="14" name="EntitySpawns">
   <object id="8" name="entitySpawn" x="868.041" y="387.562">
    <properties>
-    <property name="entity" value=""/>
+    <property name="active" type="bool" value="true"/>
+    <property name="entity" value="npc1_map1-1"/>
+    <property name="entityHeight" type="float" value="2.5"/>
+    <property name="msg" value="If you want to lower the bridge, go to the tower"/>
    </properties>
    <point/>
   </object>

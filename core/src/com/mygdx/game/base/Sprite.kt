@@ -53,6 +53,7 @@ abstract class Sprite(
     }
 
     open fun draw(batch: SpriteBatch, font: BitmapFont) {
+        batch.begin()
         batch.draw(
             atlasParts[frame],
             getLeft(), getBottom(),
@@ -61,9 +62,11 @@ abstract class Sprite(
             scale, scale,
             angle
         )
+        val rows = text.length/24
         font.draw(batch, text,
-            getLeft(), getBottom() + halfHeight + 30f,
+            getLeft(), getBottom() + halfHeight + 30f + rows * 30f,
             getWidth() - 10f, 1, true)
+        batch.end()
     }
 
     /**

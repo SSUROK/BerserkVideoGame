@@ -1,27 +1,27 @@
 package com.mygdx.game.base
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Rectangle
-import com.mygdx.game.buttons.InteractButton
+import com.badlogic.gdx.utils.Array
 import com.mygdx.game.entities.Player
-import com.mygdx.game.math.textWidth
-import com.mygdx.game.math.textXPos
-import com.mygdx.game.math.textYPos
+import com.mygdx.game.sprite.TextBubble
 
-abstract class BaseIntractable(private val mapObject: MapObject): Intractable {
+abstract class BaseIntractableObject(private val mapObject: MapObject): Intractable, Sprite (
+    Array<AtlasRegion>()
+){
     private var pointX: Float?= null
     private var pointY: Float?= null
     private var active: Boolean = true
     private var msg: String? = null
     private var activateMsg: String? = null
-    abstract val interactBtn: InteractButton
     private var objAsRect: Rectangle
     private var msgBubble: TextBubble? = null
     private var activateMsgBubble: TextBubble? = null
+    override var playerNear: Boolean = false
 
     init{
         val or = (mapObject as RectangleMapObject).rectangle
@@ -44,9 +44,11 @@ abstract class BaseIntractable(private val mapObject: MapObject): Intractable {
         return false
     }
 
-    fun render(player: Player, font: BitmapFont, batch: SpriteBatch){
+    override fun drawUI(player: Player, font: BitmapFont, batch: SpriteBatch){
         val playerRect = player.createCollisionRect()
+        playerNear = false
         if (!playerRect.overlaps(objAsRect)) return
+        playerNear = true
         if (!active) {
             if (activateMsg != null) {
                 activateMsgBubble!!.draw(batch, font)
@@ -56,6 +58,19 @@ abstract class BaseIntractable(private val mapObject: MapObject): Intractable {
         if (msgBubble!= null) {
             msgBubble!!.draw(batch, font)
         }
-        interactBtn.draw(batch, font)
+        interactBtn?.draw(batch, font)
+    }
+
+    override fun drawUI(
+        player: Player,
+        font: BitmapFont,
+        batch: SpriteBatch,
+        renderBatch: SpriteBatch,
+    ) {
+        return
+    }
+    override fun playerInRange(player: Player): Boolean {
+        val playerRect = player.createCollisionRect()
+        return playerRect.overlaps(objAsRect)
     }
 }

@@ -1,5 +1,6 @@
 package com.mygdx.game.math
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 
@@ -87,7 +88,10 @@ open class Rect(
     }
 
     fun isMe(touch: Vector2): Boolean {
-        return touch.x >= getLeft() && touch.x <= getRight() && touch.y >= getBottom() && touch.y <= getTop()
+        return touch.x >= getLeft() &&
+                touch.x <= getRight() &&
+                Gdx.graphics.height - touch.y >= getBottom() &&
+                Gdx.graphics.height - touch.y <= getTop()
     }
 
     fun isOutside(other: Rect): Boolean {

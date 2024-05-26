@@ -1,9 +1,10 @@
 package com.mygdx.game.base
 
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
 import com.mygdx.game.math.Rect
 
 /**
@@ -16,14 +17,13 @@ import com.mygdx.game.math.Rect
  * @property frame индекс текущего кадра анимации спрайта.
  * @property destroyed флаг, указывающий на уничтожение спрайта.
  */
-abstract class Sprite
-    (var angle: Float = 0f,
-     var scale:Float = 1f,
-     var regions: Array<TextureRegion?>,
-     var frame: Int = 0,
-     var destroyed: Boolean = false): Rect(){
-
-    constructor(textureRegion: TextureRegion) : this(regions=arrayOf(null))
+abstract class Sprite(
+    private val atlasParts: Array<TextureAtlas.AtlasRegion>,
+    var angle: Float = 0f,
+    var scale:Float = 1f,
+    var frame: Int = 0,
+    var text: String = "",
+    var destroyed: Boolean = false): Rect(){
 
     /**
      * Устанавливает пропорциональную высоту спрайта.
@@ -32,7 +32,7 @@ abstract class Sprite
      */
     fun setHeightProportion(height: Float) {
         setHeight(height)
-        val aspect = regions[frame]!!.regionWidth / regions[frame]!!.regionHeight.toFloat()
+        val aspect = atlasParts[frame]!!.regionWidth / atlasParts[frame]!!.regionHeight.toFloat()
         setWidth(height * aspect)
     }
 
@@ -41,15 +41,29 @@ abstract class Sprite
      *
      * @param batch объект SpriteBatch для отрисовки.
      */
-    fun draw(batch: SpriteBatch) {
+    open fun draw(batch: SpriteBatch) {
         batch.draw(
-            regions[frame],
+            atlasParts[frame],
             getLeft(), getBottom(),
             halfWidth, halfHeight,
             getWidth(), getHeight(),
             scale, scale,
             angle
         )
+    }
+
+    open fun draw(batch: SpriteBatch, font: BitmapFont) {
+        batch.draw(
+            atlasParts[frame],
+            getLeft(), getBottom(),
+            halfWidth, halfHeight,
+            getWidth(), getHeight(),
+            scale, scale,
+            angle
+        )
+        font.draw(batch, text,
+            getLeft(), getBottom() + halfHeight + 30f,
+            getWidth() - 10f, 1, true)
     }
 
     /**
@@ -95,5 +109,13 @@ abstract class Sprite
      */
     fun flushDestroy() {
         destroyed = false
+    }
+
+    open fun touchDown(touch: Vector2, pointer: Int, button: Int): Boolean {
+        return false
+    }
+
+    open fun touchUp(touch: Vector2, pointer: Int, button: Int): Boolean {
+        return false
     }
 }

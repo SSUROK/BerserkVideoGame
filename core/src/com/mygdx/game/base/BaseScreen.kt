@@ -44,9 +44,6 @@ abstract class BaseScreen (
 
     var UI_ELEMENTS: Texture? = null
     var USE_BUTTON: Texture? = null
-    val maps = mapOf("map1_1" to "data/maps/map1_1.tmx",
-        "map1_2" to "data/maps/map1_2.tmx",
-        "map1_3" to "data/maps/map1_3.tmx")
 
 
     private var touch: Vector2? = null
@@ -73,8 +70,8 @@ abstract class BaseScreen (
         player?.update(deltaTime)
 
         // let the camera follow the koala, x-axis only
-        camera?.position?.x = player?.position?.x
-        camera?.position?.y = player?.position?.y?.plus(2f)
+        camera?.position?.x = player?.pos?.x
+        camera?.position?.y = player?.pos?.y?.plus(2f)
         camera?.update()
 
         // set the TiledMapRenderer view based on what the
@@ -83,7 +80,7 @@ abstract class BaseScreen (
         renderer?.render()
 
         // render the koala
-        player?.render(deltaTime, renderer!!)
+        player?.draw(renderer!!.batch as SpriteBatch)
 
     }
 

@@ -5,9 +5,15 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.MapObjects
 import com.badlogic.gdx.maps.MapProperties
+import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
@@ -18,6 +24,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Pool
 import com.mygdx.game.base.Entity
+import com.mygdx.game.math.atlas
+import com.mygdx.game.math.charAtlas
 import kotlin.math.abs
 
 
@@ -29,7 +37,11 @@ import kotlin.math.abs
  * @param x координата X игрока на карте.
  * @param y координата Y игрока на карте.
  */
-class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
+class Player(map: TiledMap, spawnPoint: RectangleMapObject): Entity(
+    map,
+    spawnPoint,
+    charAtlas.regions
+) {
 
     public var weaponEquipped = false
     var goLeft = false
@@ -45,51 +57,37 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
     /** Инициализация игрового персонажа. Устанавливается атлас текстур, затем создаются основные
      * анимации персонажа. */
     init{
-        // load the koala frames, split them, and assign them to Animations
-        texture = Texture("data/textures/character.png")
-        val s = TextureRegion.split(texture, 32, 32)
-//        regions = s[0]
-        stand = Animation(0.15f, s[0][0], s[0][1], s[0][2], s[0][3], s[0][4], s[0][5],
-            s[0][6], s[0][7], s[0][8], s[0][9])
-        jump = Animation(0f, s[0][0])
-        walk = Animation(0.15f, s[2][0], s[2][1], s[2][2], s[2][3], s[2][4], s[2][5],
-            s[2][6], s[2][7], s[2][8], s[2][9])
-        attack = Animation(0.15f, s[3][0], s[3][1], s[3][2], s[3][3], s[3][4], s[3][5],
-            s[3][6], s[3][7], s[3][8], s[3][9], s[3][0])
-        walk?.playMode = Animation.PlayMode.LOOP_PINGPONG
-        stand?.playMode = Animation.PlayMode.LOOP_PINGPONG
-        attack?.playMode = Animation.PlayMode.LOOP_PINGPONG
+        stand = Animation(0.15f, charAtlas.findRegions("idle"), Animation.PlayMode.LOOP_PINGPONG)
+        jump = Animation(0f, charAtlas.findRegions("jump"))
+        walk = Animation(0.15f, charAtlas.findRegions("walk"), Animation.PlayMode.LOOP_PINGPONG)
+        attack = Animation(0.15f, charAtlas.findRegions("attack"), Animation.PlayMode.LOOP_PINGPONG)
 
 
 //         figure out the width and height of the koala for collision
 //         detection and rendering by converting a koala frames pixel
 //         size into world units (1 unit == 16 pixels)
-        WIDTH = 1 / 16f * s[0][0].regionWidth.toFloat()
-        HEIGHT = 1 / 16f * s[0][0].regionHeight.toFloat()
-        COLLISION_WIDTH = WIDTH * 0.5f
-        COLLISION_HEIGHT = HEIGHT
+        setHeightProportion(2.5f)
     }
 
-    /** метод отрисовки игрового персонажа на экране. должен вызываться из метода отрисовки экрана */
-    override fun render(deltaTime: Float, renderer: OrthogonalTiledMapRenderer) {
-        // based on the koala state, get the animation frame
-        var frame: TextureRegion? = null
-        frame = when (state) {
+    override fun draw(batch: SpriteBatch) {
+        batch.begin()
+        val frame = when (state) {
             State.Standing-> stand?.getKeyFrame(stateTime)
             State.Walking -> walk?.getKeyFrame(stateTime)
             State.Jumping -> jump?.getKeyFrame (stateTime)
             State.Attacking -> attack?.getKeyFrame(stateTime)
         }
-        // draw the koala, depending on the current velocity
-        // on the x-axis, draw the koala facing either right
-        // or left
-        val batch: Batch =  renderer.batch
-        batch.begin()
-        if (facesRight) {
-            batch.draw(frame, position.x, position.y, WIDTH, HEIGHT)
-        } else {
-            batch.draw(frame, position.x + WIDTH, position.y, -WIDTH, HEIGHT)
-        }
+        var face = getWidth()
+        var posx = getLeft()
+        if (!facesRight) { face = -face; posx = getRight() }
+        batch.draw(
+            frame,
+            posx, pos.y,
+            halfWidth, halfHeight,
+            face, getHeight(),
+            scale, scale,
+            angle
+        )
         batch.end()
     }
 
@@ -103,7 +101,7 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
         if (delta > 0.1f) deltaTime = 0.1f
 
-        this.stateTime += deltaTime
+        stateTime += deltaTime
 
         if (goLeft) {
             moveLeft()
@@ -116,18 +114,26 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 //        if (Gdx.input.isKeyJustPressed(Keys.B)) debug = !debug
 
         // apply gravity if we are falling
-        this.velocity.add(0f, GRAVITY)
+        velocity.add(0f, GRAVITY)
 
+//        if (velocity.x == 0f && grounded){ state = State.Standing }
+//
+//        if (goLeft)
+//            velocity.add(-deltaTime, 0f)
+//        else if (goRight)
+//            velocity.add(deltaTime, 0f)
+//        else
+//            velocity.x *= DAMPING
 
         // clamp the velocity to the maximum, x-axis only
-        this.velocity.x =
-            MathUtils.clamp(this.velocity.x, - this.MAX_VELOCITY, this.MAX_VELOCITY)
+        velocity.x =
+            MathUtils.clamp(velocity.x, - MAX_VELOCITY, MAX_VELOCITY)
 
-        if (this.state == State.Attacking && this.stateTime > ATTACK_TIME) {
-            this.stateTime = 0f
-            if (this.grounded) {
-                this.state = State.Jumping
-            } else this.state = State.Standing
+        if (state == State.Attacking && stateTime > ATTACK_TIME) {
+            stateTime = 0f
+            state = if (grounded) {
+                State.Jumping
+            } else State.Standing
         }
 
         // If the velocity is < 1, set it to 0 and set state to Standing
@@ -148,39 +154,35 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         var endX: Int
         var endY: Int
         if (this.velocity.x > 0) {
-            endX = (position.x + velocity.x * COLLISION_WIDTH).toInt()
-            startX = position.x.toInt()
-        } else if (velocity.x < 0) {
-            startX = (position.x + velocity.x * COLLISION_WIDTH).toInt()
-            endX = position.x.toInt()
+            endX = (pos.x + halfWidth + velocity.x).toInt()
+            startX = endX
         } else {
-            startX = position.x.toInt()
-            endX = position.x.toInt()
+            startX = (pos.x + velocity.x).toInt()
+            endX = startX
         }
-        println("%s, %s, %s, %s".format(startX, endX, position.x, velocity.x))
-        startY = this.position.y.toInt()
-        endY = (this.position.y + this.COLLISION_HEIGHT).toInt()
+        startY = pos.y.toInt()
+        endY = (pos.y + getHeight()).toInt()
         getTiles(startX, startY, endX, endY, tiles)
-        playerRect.x += this.velocity.x
+        playerRect.x += velocity.x
         for (tile in tiles) {
             if (playerRect.overlaps(tile)) {
-                this.velocity.x = 0f
+                velocity.x = 0f
                 break
             }
         }
-        playerRect.x = this.position.x
+        playerRect.x = pos.x
 
         // if the this is moving upwards, check the tiles to the top of its
         // top bounding box edge, otherwise check the ones to the bottom
-        if (this.velocity.y > 0) {
-            endY = (this.position.y + this.COLLISION_HEIGHT + this.velocity.y).toInt()
+        if (velocity.y > 0) {
+            endY = (pos.y + getHeight() + velocity.y).toInt()
             startY = endY
         } else {
-            endY = (this.position.y + this.velocity.y).toInt()
+            endY = (pos.y + velocity.y).toInt()
             startY = endY
         }
-        startX = this.position.x.toInt()
-        endX = (this.position.x + this.COLLISION_WIDTH).toInt()
+        startX = pos.x.toInt()
+        endX = (pos.x + getWidth()).toInt()
         getTiles(startX, startY, endX, endY, tiles)
         playerRect.y += velocity.y
         for (tile in tiles) {
@@ -189,12 +191,12 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
                 // so it is just below/above the tile we collided with
                 // this removes bouncing :)
                 if (velocity.y > 0) {
-                    position.y = tile.y - HEIGHT
+                    pos.y = tile.y - getHeight()
                     // we hit a block jumping upwards, let's destroy it!
 //                    val layer = map.layers["walls"] as TiledMapTileLayer
 //                    layer.setCell(tile.x.toInt(), tile.y.toInt(), null)
                 } else {
-                    position.y = tile.y + tile.height
+                    pos.y = tile.y + tile.height
                     // if we hit the ground, mark us as grounded so we can jump
                     grounded = true
                 }
@@ -206,8 +208,8 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
         // unscale the velocity by the inverse delta time and set
         // the latest position
-        this.position.add(this.velocity)
-        this.velocity.scl(1 / deltaTime)
+        pos.add(this.velocity)
+        velocity.scl(1 / deltaTime)
 
         // Apply damping to the velocity on the x-axis so we don't
         // walk infinitely once a key was pressed
@@ -231,12 +233,9 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
         }
     }
 
-    fun touchDown(v: Vector2, pointer: Int, button: Int){
-
-    }
-
     /** метод для прыжеов персонажа */
     fun jump(){
+        if (!this.grounded) { return }
         this.velocity.y += this.JUMP_VELOCITY
         this.state = State.Jumping
         this.grounded = false
@@ -244,16 +243,18 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
 
     /** метод движения налево */
     private fun moveLeft(){
-        this.velocity.x = -this.MAX_VELOCITY
-        if (this.grounded) this.state = State.Walking
-        this.facesRight = false
+        velocity.x = -MAX_VELOCITY
+        if (grounded) state = State.Walking
+        facesRight = false
     }
     /** метод движения направо */
     private fun moveRight(){
-        this.velocity.x = this.MAX_VELOCITY
-        if (this.grounded) this.state = State.Walking
-        this.facesRight = true
+        velocity.x = MAX_VELOCITY
+        if (grounded) state = State.Walking
+        facesRight = true
     }
+
+
 
     /** метод атаки персонажа */
     fun attack(){
@@ -267,7 +268,23 @@ class Player(map: TiledMap, x: Float, y: Float): Entity(map, x, y) {
     /** метод создания коллизии персонажа */
     fun createCollisionRect(): Rectangle {
         val playerRect: Rectangle = rectPool.obtain()
-        playerRect.set(position.x, position.y, COLLISION_WIDTH, COLLISION_HEIGHT)
+        playerRect.set(pos.x, pos.y, getWidth(), getHeight())
         return playerRect
+    }
+
+    override fun touchDown(touch: Vector2, pointer: Int, button: Int): Boolean {
+        when {
+            touch.x in 0f .. 0.25f -> {goLeft = true}
+            touch.x in 0.75f .. 1f -> {goRight = true}
+            touch.x in 0.25f .. 0.75f && touch.y in 0f.. 0.5f -> jump()
+            touch.x in 0.25f .. 0.75f && touch.y in 0.5f.. 1f -> attack()
+        }
+        return false
+    }
+
+    override fun touchUp(touch: Vector2, pointer: Int, button: Int): Boolean {
+        goLeft = false
+        goRight = false
+        return false
     }
 }

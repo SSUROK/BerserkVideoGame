@@ -1,0 +1,152 @@
+charAtlas.png
+size: 354, 32
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+idle
+  rotate: false
+  xy: 0, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 0
+idle
+  rotate: false
+  xy: 16, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 1
+idle
+  rotate: false
+  xy: 32, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 2
+idle
+  rotate: false
+  xy: 48, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 3
+idle
+  rotate: false
+  xy: 64, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 4
+idle
+  rotate: false
+  xy: 80, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 5
+idle
+  rotate: false
+  xy: 96, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 6
+idle
+  rotate: false
+  xy: 112, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 7
+idle
+  rotate: false
+  xy: 128, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 8
+idle
+  rotate: false
+  xy: 144, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: 9
+jump
+  rotate: false
+  xy: 160, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 8, 0
+  index: -1
+walk
+  rotate: false
+  xy: 176, 0
+  size: 17, 32
+  orig: 32, 32
+  offset: 6, 0
+  index: 0
+walk
+  rotate: false
+  xy: 193, 0
+  size: 18, 32
+  orig: 32, 32
+  offset: 5, 0
+  index: 1
+walk
+  rotate: false
+  xy: 211, 0
+  size: 17, 32
+  orig: 32, 32
+  offset: 6, 0
+  index: 2
+walk
+  rotate: false
+  xy: 228, 0
+  size: 18, 32
+  orig: 32, 32
+  offset: 5, 0
+  index: 3
+walk
+  rotate: false
+  xy: 246, 0
+  size: 20, 31
+  orig: 32, 32
+  offset: 4, 0
+  index: 4
+walk
+  rotate: false
+  xy: 266, 0
+  size: 20, 32
+  orig: 32, 32
+  offset: 4, 0
+  index: 5
+walk
+  rotate: false
+  xy: 286, 0
+  size: 19, 32
+  orig: 32, 32
+  offset: 4, 0
+  index: 6
+walk
+  rotate: false
+  xy: 305, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 7, 0
+  index: 7
+walk
+  rotate: false
+  xy: 321, 0
+  size: 16, 32
+  orig: 32, 32
+  offset: 7, 0
+  index: 8
+walk
+  rotate: false
+  xy: 337, 0
+  size: 17, 31
+  orig: 32, 32
+  offset: 7, 0
+  index: 9

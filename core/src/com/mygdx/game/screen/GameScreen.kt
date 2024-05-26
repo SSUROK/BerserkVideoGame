@@ -1,7 +1,6 @@
 package com.mygdx.game.screen
 
 import com.badlogic.gdx.Game
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -15,8 +14,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
+import com.mygdx.game.base.BaseIntractable
 import com.mygdx.game.base.BaseScreen
 import com.mygdx.game.entities.Player
+import com.mygdx.game.objects.Warp
 
 
 /**
@@ -30,11 +32,13 @@ class GameScreen(game: Game, private val mapFilePath: String) : BaseScreen(game)
     private var chestTriggers : MapObjects? = null
     private var activeChest : RectangleMapObject? = null
     private var map: TiledMap? = null
-    private var poiLayer: MapLayer? = null
-    private var warpPoints: MapObjects? = null
     private var playerInWarp = false
+    private lateinit var spawnPoint: RectangleMapObject
+    private val mapLayers = mutableMapOf<String, MapLayer?>()
+    private val mapIntractableObjects = mutableListOf<BaseIntractable>()
+    private val mapStaticObjects = mutableListOf<BaseIntractable>()
     private lateinit var activeWarpPoint: MapObject
-    val font = BitmapFont()
+    private val font = BitmapFont()
 
     /**
      * Вызывается при создании экрана. Здесь происходит инициализация всех необходимых
@@ -44,28 +48,16 @@ class GameScreen(game: Game, private val mapFilePath: String) : BaseScreen(game)
         super.show()
         map = TmxMapLoader().load(mapFilePath)
         renderer = OrthogonalTiledMapRenderer(map, 1/16f)
-        poiLayer = map?.getLayers()?.get("POI")
-        val spawnPoint = poiLayer?.objects?.get("spawn") as RectangleMapObject
-        textTriggers = map?.getLayers()?.get("TextTriggers")?.objects
-        chestTriggers = map?.getLayers()?.get("ChestTriggers")?.objects
-        warpPoints = map?.getLayers()?.get("WarpPoints")?.objects
 
-        val entitySpawns = poiLayer?.objects
-        for (obj in entitySpawns!!) {
-            if (obj.name == "entitySpawn") {
-                val entity = obj.properties.get("entity")
-
-            }
-        }
+        getLayers()
+        spawnPlayer()
 
         batch = SpriteBatch()
 
-        player = Player(map!!, spawnPoint.rectangle.x/16f, spawnPoint.rectangle.y/16f)
-        player?.screen = this
         camera = OrthographicCamera()
         camera!!.setToOrtho(false, 30f, 20f)
         camera!!.update()
-        camera!!.position.y = player!!.position.y + 5f
+        camera!!.position.y = player!!.pos.y + 5f
         font.data.setScale(5f)
         font.color = Color.BLACK
     }
@@ -76,48 +68,34 @@ class GameScreen(game: Game, private val mapFilePath: String) : BaseScreen(game)
      */
     override fun render(delta: Float) {
         super.render(delta)
-        val playerRect = player?.createCollisionRect()
-        if (textTriggers != null) {
-            for (obj in textTriggers!!) {
-                val or = (obj as RectangleMapObject).rectangle
-                val trRect = Rectangle(or.x/16f, or.y/16f, or.width/16f, or.height/16f)
-                if (playerRect!!.overlaps(trRect) && obj.properties.get("active") as Boolean) {
-                    val text = obj.properties.get("msg") as String
-                    batch?.begin()
-                    font.draw(batch, text, Gdx.graphics.width/2f-600f, Gdx.graphics.height/2f + 100f, 1200f, 1, true)
-                    batch?.end()
-                }
-            }
+        batch?.begin()
+        for (o in mapIntractableObjects){
+            o.render(player!!, font, batch!!)
         }
-        if (chestTriggers!= null) {
-            for (obj in chestTriggers!!) {
-                val or = (obj as RectangleMapObject).rectangle
-                val trRect = Rectangle(or.x/16f, or.y/16f, or.width/16f, or.height/16f)
-                if (playerRect!!.overlaps(trRect) && !(obj.properties.get("open") as Boolean)) {
-                    val text = obj.properties.get("msg") as String
-                    if (activeChest == null) activeChest = obj
-                    batch?.begin()
-                    font.draw(batch, text, Gdx.graphics.width/2f-600f, Gdx.graphics.height/2f + 100f, 1200f, 1, true)
-                    batch?.end()
-                } else if (activeChest != null) activeChest = null
-            }
+        batch?.end()
+    }
+
+    private fun getLayers(){
+        mapLayers["poi"] = map?.layers?.get("POI")
+        spawnPoint = mapLayers["poi"]!!.objects.get("spawn") as RectangleMapObject
+        mapLayers["text"] = map?.layers?.get("TextTriggers")
+        mapLayers["chest"] = map?.layers?.get("ChestTriggers")
+        mapLayers["warps"] = map?.layers?.get("WarpPoints")
+        mapLayers["hazards"] = map?.layers?.get("Hazards")
+
+//        for (poi in mapLayers["poi"]!!.objects){
+//
+//        }
+
+        for (w in mapLayers["warps"]!!.objects){
+            mapIntractableObjects.add(Warp(w, game))
         }
-        if (warpPoints!= null) {
-            for (obj in warpPoints!!) {
-                val or = (obj as RectangleMapObject).rectangle
-                val trRect = Rectangle(or.x/16f, or.y/16f, or.width/16f, or.height/16f)
-                val active = if (obj.properties.get("active") != null) obj.properties.get("active") as Boolean else true
-                if (playerRect!!.overlaps(trRect) && active) {
-                    val text = obj.properties.get("msg") as String
-                    if (activeChest == null) activeChest = obj
-                    playerInWarp = true
-                    activeWarpPoint = obj
-                    batch?.begin()
-                    font.draw(batch, text, Gdx.graphics.width/2f-600f, Gdx.graphics.height/2f + 100f, 1200f, 1, true)
-                    batch?.end()
-                } else if (activeChest != null) activeChest = null
-            }
-        }
+    }
+
+
+    private fun spawnPlayer(){
+        player = Player(map!!, spawnPoint)
+        player?.screen = this
     }
 
     /**
@@ -132,33 +110,18 @@ class GameScreen(game: Game, private val mapFilePath: String) : BaseScreen(game)
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         val xTouch = screenX/SCREEN_WIDTH
         val yTouch = screenY/SCREEN_HEIGHT
-
-        when {
-            xTouch in 0f .. 0.25f -> {player?.goLeft = true}
-            xTouch in 0.75f .. 1f -> {player?.goRight = true}
-            xTouch in 0.25f .. 0.75f && yTouch in 0f.. 0.5f -> {player?.jump()}
-            xTouch in 0.25f .. 0.75f && yTouch in 0.5f.. 1f && !playerInWarp -> {
-                player?.attack()}
-            xTouch in 0.25f .. 0.75f && yTouch in 0.5f.. 1f && playerInWarp -> {
-                val d = activeWarpPoint.properties.get("to") as String
-                val dest = maps[d]!!
-                game.screen = GameScreen(game, dest)
-            }
+        for (o in mapIntractableObjects){
+            o.interactBtn.touchDown(Vector2(screenX.toFloat(), screenY.toFloat()), pointer, button)
         }
-
-        if(activeChest!= null){
-            val or = activeChest!!.rectangle
-            val trRect = Rectangle(or.x/16f, or.y/16f, or.width/16f, or.height/16f)
-            activeChest!!.properties.put("open", true)
-            player?.weaponEquipped = true
-            textTriggers?.get("attackMsg")?.properties?.put("active", true)
-        }
+        player?.touchDown(Vector2(xTouch, yTouch), pointer, button)
         return false
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        player?.goRight = false
-        player?.goLeft = false
+        for (o in mapIntractableObjects){
+            o.interactBtn.touchUp(Vector2(screenX.toFloat(), screenY.toFloat()), pointer, button)
+        }
+        player?.touchUp(Vector2(screenX.toFloat(), screenY.toFloat()), pointer, button)
         return false
     }
 

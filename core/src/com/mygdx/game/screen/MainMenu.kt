@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.mygdx.game.base.BaseScreen
-import com.mygdx.game.sprite.Background
+//import com.mygdx.game.sprite.Background
 
 
 /**
@@ -19,7 +19,7 @@ import com.mygdx.game.sprite.Background
  */
 class MainMenu(game:Game) : BaseScreen(game) {
 
-    private var background: Background? = null
+//    private var background: Background? = null
 
     private var bg: Texture? = null
     private var title: TextureRegion? = null
